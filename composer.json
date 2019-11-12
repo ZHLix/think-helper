@@ -1,0 +1,20 @@
+{
+    "name": "zhlix/think-helper",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "zhlix",
+            "email": "15127441165@sina.cn"
+        }
+    ],
+    "require": {
+        "ext-openssl": "*",
+        "php": ">=5.4.0",
+        "luoyy/think-blade": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "zhlix\\helper\\": "src"
+        }
+    }
+}
