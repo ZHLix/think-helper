@@ -63,8 +63,8 @@ class Rsa
     public function __construct($config = [])
     {
         $this->config = array_merge($this->config, config('rsa') ?: []);
-        if (issset($config['opensslCnf'])) $this->config['opensslCnf'] = $config['opensslCnf'];
-        if (issset($config['folderName'])) $this->config['folderName'] = $config['folderName'];
+        if (isset($config['opensslCnf'])) $this->config['opensslCnf'] = $config['opensslCnf'];
+        if (isset($config['folderName'])) $this->config['folderName'] = $config['folderName'];
 
         $this->folderName = md5($this->config['folderName']);
         if (!is_dir($this->folderName)) mkdir(md5($this->config['folderName']));
