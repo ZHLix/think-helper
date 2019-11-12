@@ -55,7 +55,7 @@ if (!function_exists('time_micro')) {
     function time_micro()
     {
         list($msec, $sec) = explode(' ', microtime());
-        return (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
+        return (float) sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
     }
 }
 
