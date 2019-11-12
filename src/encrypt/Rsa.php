@@ -45,21 +45,27 @@ class Rsa
     public $publicKey = null;
 
     /**
+     * @param array $config
      * @return Rsa 实例化当前类
      */
-    public static function instance()
+    public static function instance($config = [])
     {
         if (is_null(self::$instance)) {
-            self::$instance = new static();
+            self::$instance = new static($config = []);
         }
         return self::$instance;
     }
 
     /**
      * Rsa constructor. 初始化
+     * @param array $config
      */
-    public function __construct()
+    public function __construct($config = [])
     {
+        $this->config = array_merge($this->config, config('rsa') || []);
+        if (issset($config['opensslCnf'])) $this->config['opensslCnf'] = $config['opensslCnf'];
+        if (issset($config['folderName'])) $this->config['folderName'] = $config['folderName'];
+
         $this->folderName = md5($this->config['folderName']);
         if (!is_dir($this->folderName)) mkdir(md5($this->config['folderName']));
 
