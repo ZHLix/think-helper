@@ -1,7 +1,8 @@
 <?php
 
-
+use think\Db;
 use \think\response\Json;
+use zhlix\helper\curl\Http;
 use zhlix\helper\encrypt\Rsa;
 
 if (!function_exists('p')) {
@@ -100,5 +101,65 @@ if (!function_exists('rsa_encode')) {
     function rsa_encode($string)
     {
         return Rsa::instance()->encode($string);
+    }
+}
+
+if (!function_exists('http_get')) {
+    /**
+     * 以get访问模拟访问
+     *
+     * @param string $url   访问URL
+     * @param array  $query GET数
+     * @param array  $options
+     *
+     * @return array
+     * @throws Exception
+     */
+    function http_get($url, $query = [], $options = [])
+    {
+        return Http::get($url, $query, $options);
+    }
+}
+
+if (!function_exists('http_post')) {
+    /**
+     * 以post访问模拟访问
+     *
+     * @param string $url  访问URL
+     * @param array  $data POST数据
+     * @param array  $options
+     *
+     * @return array
+     * @throws Exception
+     */
+    function http_post($url, $data = [], $options = [])
+    {
+        return Http::post($url, $data, $options);
+    }
+}
+
+if (!function_exists('handle')) {
+    /**
+     * @return Json
+     */
+    function handle()
+    {
+        $args = func_get_args();
+        $params = array_merge([], array_filter($args, function ($val) {
+            return !is_callable($val);
+        }));
+        list($func) = array_merge([], array_filter($args, function ($val) {
+            return is_callable($val);
+        }));
+
+        Db::startTrans();
+        try {
+            $res = $func(...$params);
+            Db::commit();
+            return $res;
+        } catch (Exception $e) {
+            Db::rollback();
+            return result(null, $e->getCode() ?: 400, $e->getMessage());
+        }
     }
 }

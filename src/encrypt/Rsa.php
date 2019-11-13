@@ -51,7 +51,7 @@ class Rsa
     public static function instance($config = [])
     {
         if (is_null(self::$instance)) {
-            self::$instance = new static($config = []);
+            self::$instance = new static($config);
         }
         return self::$instance;
     }
