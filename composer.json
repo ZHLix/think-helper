@@ -11,7 +11,8 @@
         "ext-openssl": "*",
         "php": ">=7.1.0",
         "topthink/framework": "5.0.*",
-        "luoyy/think-blade": "^2.0"
+        "luoyy/think-blade": "^2.0",
+        "topthink/think-captcha": "^1.0"
     },
     "autoload": {
         "psr-4": {

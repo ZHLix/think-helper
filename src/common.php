@@ -163,3 +163,34 @@ if (!function_exists('handle')) {
         }
     }
 }
+
+if (!function_exists('captcha_img_re')) {
+    /**
+     * 验证码 添加刷新功能
+     *
+     * @param bool $isLogin
+     *
+     * @return string
+     */
+    function captcha_img_re($isLogin = false)
+    {
+        $height = 38;
+        if ($isLogin) $height = 50;
+        return '<img class="captcha" src="' . captcha_src() . '" onclick="this.src=\'' . captcha_src() . '\'" title=\'看不清？点击换一张\' style="height: ' . $height . 'px">';
+    }
+}
+
+// 应用公共文件
+if (!function_exists('asset')) {
+    /**
+     * 页面资源模板路径
+     *
+     * @param $path
+     *
+     * @return string
+     */
+    function asset($path)
+    {
+        return Http::urlHeader() . "/assets/$path";
+    }
+}
