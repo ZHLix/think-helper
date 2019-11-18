@@ -27,18 +27,18 @@ class BaseController extends Controller
         if (file_exists("./assets/$path.js")) {
             // vendor
             if (file_exists("./assets/$path_root/vendor.js")) {
-                $res[] = "<script src='" . asset("$path_root/vendor.js") . "'></script>";
+                $res[] = asset("$path_root/vendor.js");
             }
             // manifest
             if (file_exists("./assets/$path_root/manifest.js")) {
-                $res[] = "<script src='" . asset("$path_root/manifest.js") . "'></script>";
+                $res[] = asset("$path_root/manifest.js");
             }
-            $res[] = "<script src='" . asset("$path.js") . "'></script>";
+            $res[] = asset("$path.js");
         }
 
         // css
         if (file_exists("./assets/$path.css")) {
-            $res[] = "<link rel='stylesheet' href='" . asset("$path.css") . "'>";
+            $res[] = asset("$path.css");
         }
 
         $this->assign('assets', implode('', $res));

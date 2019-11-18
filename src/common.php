@@ -56,7 +56,7 @@ if (!function_exists('time_micro')) {
     function time_micro()
     {
         list($msec, $sec) = explode(' ', microtime());
-        return (float) sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
+        return (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
     }
 }
 
@@ -108,9 +108,9 @@ if (!function_exists('http_get')) {
     /**
      * 以get访问模拟访问
      *
-     * @param string $url   访问URL
-     * @param array  $query GET数
-     * @param array  $options
+     * @param string $url 访问URL
+     * @param array $query GET数
+     * @param array $options
      *
      * @return array
      * @throws Exception
@@ -125,9 +125,9 @@ if (!function_exists('http_post')) {
     /**
      * 以post访问模拟访问
      *
-     * @param string $url  访问URL
-     * @param array  $data POST数据
-     * @param array  $options
+     * @param string $url 访问URL
+     * @param array $data POST数据
+     * @param array $options
      *
      * @return array
      * @throws Exception
@@ -191,6 +191,16 @@ if (!function_exists('asset')) {
      */
     function asset($path)
     {
-        return Http::urlHeader() . "/assets/$path";
+        $path = "assets/$path";
+        preg_match("/\.(.*)$/", $path, $output);
+        list(, $ext) = $output;
+
+        if ($ext === 'js' && file_exists("./$path")) {
+            return "<script src='/$path'></script>";
+        } else if ($ext === 'css' && file_exists("./$path")) {
+            return "<link rel='stylesheet' href='/$path'>";
+        } else {
+            exit("$path 文件不存在或文件并不是 css/js 资源文件");
+        }
     }
 }
