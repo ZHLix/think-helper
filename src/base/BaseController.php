@@ -6,7 +6,6 @@ namespace zhlix\helper\base;
 
 use think\Controller;
 use think\Loader;
-use think\Request;
 
 class BaseController extends Controller
 {
@@ -15,14 +14,25 @@ class BaseController extends Controller
     protected function assets()
     {
         $res = [];
-        $path = implode('/', [
+        $path_root = implode('/', [
             $this->request->module(),
-            Loader::parseName($this->request->controller()),
+            Loader::parseName($this->request->controller())
+        ]);
+        $path = implode('/', [
+            $path_root,
             $this->request->action()
         ]);
 
         // js
         if (file_exists("./assets/$path.js")) {
+            // vendor
+            if (file_exists("./assets/$path_root/vendor.js")) {
+                $res[] = "<script src='" . asset("$path_root/vendor.js") . "'></script>";
+            }
+            // manifest
+            if (file_exists("./assets/$path_root/manifest.js")) {
+                $res[] = "<script src='" . asset("$path_root/manifest.js") . "'></script>";
+            }
             $res[] = "<script src='" . asset("$path.js") . "'></script>";
         }
 
