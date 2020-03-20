@@ -1,6 +1,6 @@
 <?php
 
-use think\Db;
+use think\facade\Db;
 use \think\response\Json;
 use zhlix\helper\curl\Http;
 use zhlix\helper\encrypt\Rsa;
@@ -142,23 +142,18 @@ if (!function_exists('handle')) {
     /**
      * @return Json
      */
-    function handle()
+    function handle(Closure $closure, $trans = false)
     {
-        $args = func_get_args();
-        $params = array_merge([], array_filter($args, function ($val) {
-            return !is_callable($val);
-        }));
-        list($func) = array_merge([], array_filter($args, function ($val) {
-            return is_callable($val);
-        }));
-
-        Db::startTrans();
+        // 开启事务
+        $trans && Db::startTrans();
         try {
-            $res = $func(...$params);
-            Db::commit();
+            $res = $closure();
+            // 提交事务
+            $trans && Db::commit();
             return $res;
         } catch (Exception $e) {
-            Db::rollback();
+            // 回滚事务
+            $trans && Db::rollback();
             return result(null, $e->getCode() ?: 400, $e->getMessage());
         }
     }
