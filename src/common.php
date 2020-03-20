@@ -171,7 +171,9 @@ if (!function_exists('captcha_img_re')) {
     {
         $height = 38;
         if ($isLogin) $height = 50;
-        return '<img class="captcha" src="' . captcha_src() . '" onclick="this.src=\'' . captcha_src() . '\'" title=\'看不清？点击换一张\' style="height: ' . $height . 'px">';
+        $src = captcha_src();
+
+        return "<img alt='captcha' class='captcha' src='{$src}' onclick='this.src=\"{$src}?\"+Math.random();' title='看不清？点击换一张' style='height: {$height}px;'>";
     }
 }
 
