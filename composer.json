@@ -10,8 +10,8 @@
     "require": {
         "ext-openssl": "*",
         "php": ">=7.1.0",
-        "topthink/framework": "*",
-        "luoyy/think-blade": "^2.0",
+        "topthink/framework": "^6.0.1",
+        "luoyy/think-blade": "^6.0.1",
         "topthink/think-captcha": "^3.0"
     },
     "autoload": {
