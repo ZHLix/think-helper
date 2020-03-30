@@ -1,16 +1,11 @@
 <?php
 
 
-namespace zhlix\helper\encrypt;
+namespace zhlix\helper;
 
 
 class Rsa
 {
-    /**
-     * @var Rsa 对象实例
-     */
-    protected static $instance;
-
     /**
      * @var array 初始配置项
      */
@@ -43,18 +38,6 @@ class Rsa
      * @var string 公钥
      */
     public $publicKey = null;
-
-    /**
-     * @param array $config
-     * @return Rsa 实例化当前类
-     */
-    public static function instance($config = [])
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new static($config);
-        }
-        return self::$instance;
-    }
 
     /**
      * Rsa constructor. 初始化

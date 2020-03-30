@@ -1,6 +1,6 @@
 <?php
 
-namespace zhlix\helper\curl;
+namespace zhlix\helper;
 
 use Exception;
 
@@ -10,7 +10,7 @@ class Http
     /**
      * 服务器域名
      */
-    public static function urlHeader()
+    public function urlHeader ()
     {
         $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
 
@@ -24,7 +24,7 @@ class Http
      *
      * @return null|string|string
      */
-    protected static function arr2json($data)
+    protected function arr2json ($data)
     {
         return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
             return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
@@ -39,16 +39,16 @@ class Http
      * @return array
      * @throws Exception
      */
-    protected static function json2arr($json)
+    protected function json2arr ($json)
     {
         $result = json_decode($json, true);
 
         if (is_array($result)) {
             if (empty($result)) {
-                exception('invalid response.', '0');
+                throw new Exception('invalid response.', '0');
             }
             if (!empty($result['errcode'])) {
-                exception($result['errmsg'], $result['errcode']);
+                throw new Exception($result['errmsg'], $result['errcode']);
             }
         } else if (is_null($result) && !is_null($json)) {
             $result = $json;
@@ -66,10 +66,10 @@ class Http
      * @return array
      * @throws Exception
      */
-    public static function get($url, $query = [], $options = [])
+    public function get ($url, $query = [], $options = [])
     {
         $options['query'] = $query;
-        return self::json2arr(self::doRequest('get', $url, $options));
+        return $this->json2arr($this->doRequest('get', $url, $options));
     }
 
     /**
@@ -82,10 +82,10 @@ class Http
      * @return array
      * @throws Exception
      */
-    public static function post($url, $data = [], $options = [])
+    public function post ($url, $data = [], $options = [])
     {
         $options['data'] = $data;
-        return self::json2arr(self::doRequest('post', $url, $options));
+        return $this->json2arr($this->doRequest('post', $url, $options));
     }
 
     /**
@@ -97,7 +97,7 @@ class Http
      *
      * @return mixed
      */
-    public static function doRequest($method, $url, $options = [])
+    protected function doRequest ($method, $url, $options = [])
     {
         $curl = curl_init();
         // GET参数设置
