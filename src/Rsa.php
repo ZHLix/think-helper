@@ -21,7 +21,7 @@ class Rsa
         /**
          * @var string 密钥对存放文件夹名
          */
-        'folderName' => 'rsa_cache'
+        'folderName' => 'rsa_cache',
     ];
 
     /**
@@ -41,9 +41,10 @@ class Rsa
 
     /**
      * Rsa constructor. 初始化
+     *
      * @param array $config
      */
-    public function __construct($config = [])
+    public function __construct ($config = [])
     {
         $this->config = array_merge($this->config, config('rsa') ?: []);
         if (isset($config['opensslCnf'])) $this->config['opensslCnf'] = $config['opensslCnf'];
@@ -62,12 +63,13 @@ class Rsa
 
     /**
      * 初始化 密钥对
+     *
      * @return $this
      */
-    public function generator()
+    public function generator ()
     {
         $config = [
-            "digest_alg" => "sha512",
+            "digest_alg"       => "sha512",
             "private_key_bits" => 2048,           //字节数  512 1024 2048  4096 等 ,不能加引号，此处长度与加密的字符串长度有关系，可以自己测试一下
             "private_key_type" => OPENSSL_KEYTYPE_RSA,   //加密类型
         ];
@@ -93,7 +95,7 @@ class Rsa
      *
      * @return string
      */
-    public function decode($data)
+    public function decode ($data)
     {
         openssl_private_decrypt(base64_decode($data), $output, $this->privateKey);
         return $output;
@@ -106,9 +108,25 @@ class Rsa
      *
      * @return string
      */
-    public function encode($data)
+    public function encode ($data)
     {
         openssl_public_encrypt($data, $output, $this->publicKey);
         return base64_encode($output);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPublicKey (): string
+    {
+        return $this->publicKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrivateKey (): string
+    {
+        return $this->privateKey;
     }
 }
