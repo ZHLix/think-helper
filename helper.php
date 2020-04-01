@@ -124,10 +124,22 @@ if (!function_exists('http_post')) {
 }
 
 if (!function_exists('handle')) {
+    function (Closure $closure, $trans = false)
+    {
+        $res = \zhlix\helper\facade\Handle::instance($closure);
+        if ($trans) $res->trans();
+        return $res->exce();
+    }
+}
+
+if (!function_exists('handle_re')) {
     /**
-     * @return Json
+     * @param Closure $closure
+     * @param bool    $trans
+     *
+     * @return mixed|Json
      */
-    function handle (Closure $closure, $trans = false)
+    function handle_re (Closure $closure, $trans = false)
     {
         // 开启事务
         $trans && Db::startTrans();
