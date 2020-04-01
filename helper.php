@@ -124,7 +124,7 @@ if (!function_exists('http_post')) {
 }
 
 if (!function_exists('handle')) {
-    function (Closure $closure, $trans = false)
+    function handle(Closure $closure, $trans = false)
     {
         $res = \zhlix\helper\facade\Handle::instance($closure);
         if ($trans) $res->trans();
