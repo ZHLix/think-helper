@@ -43,7 +43,7 @@ class Handle
      *
      * @param \Closure $closure
      */
-    public function __construct ($closure = null)
+    public function __construct($closure = null)
     {
         if (!is_null($closure)) $this->func = $closure;
     }
@@ -51,7 +51,7 @@ class Handle
     /**
      * @param \Closure $closure
      */
-    public function exec ($closure = null)
+    public function exec($closure = null)
     {
         if ($closure) $this->func = $closure;
 
@@ -84,20 +84,22 @@ class Handle
             $this->code    = $e->getCode() ?: 400;
             $this->message = $e->getMessage();
         }
+        return $this;
     }
 
     /**
      * 开启事务
      */
-    public function trans ()
+    public function trans()
     {
         $this->trans = true;
+        return $this;
     }
 
     /**
      * @return \think\response\Json
      */
-    public function result ()
+    public function result()
     {
         return result($this->data, $this->code, $this->message);
     }
