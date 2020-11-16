@@ -1,4 +1,9 @@
 <?php
+/*
+ * @LastEditors: zhlix <15127441165@163.com>
+ * @LastEditTime: 2020-11-16 07:05:44
+ * @FilePath: /app/src/Http.php
+ */
 
 namespace zhlix\helper;
 
@@ -6,16 +11,69 @@ use Exception;
 
 class Http
 {
+    /**
+     * 初始化
+     */
+    protected function __construct()
+    {
+        $this->_curl = curl_init();
+        curl_setopt($this->_curl, CURLOPT_HEADER, false);
+        curl_setopt($this->_curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($this->_curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->_curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($this->_curl, CURLOPT_SSL_VERIFYHOST, false);
+    }
 
     /**
-     * 服务器域名
+     * curl 对象
+     *
+     * @var curl
      */
-    public function urlHeader ()
-    {
-        $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
+    protected $_curl = null;
 
-        return $http_type . $_SERVER['HTTP_HOST'];
-    }
+    /**
+     * 请求地址
+     *
+     * @var string
+     */
+    protected $_url = null;
+
+    /**
+     * 请求方式
+     *
+     * @var string
+     */
+    protected $_method = 'get';
+
+    /**
+     * 请求头信息
+     *
+     * @var array
+     */
+    protected $_header = [
+        'content-type: application/json'
+    ];
+
+    /**
+     * 请求参数
+     *
+     * @var array
+     */
+    protected $_params = [];
+
+    /**
+     * 超时时间
+     *
+     * @var integer
+     */
+    protected $_timeout = 60;
+
+    /**
+     * 连接超时时间
+     *
+     * @var integer
+     */
+    protected $_connect_timeout = null;
 
     /**
      * 数组转xml内容
@@ -24,7 +82,7 @@ class Http
      *
      * @return null|string|string
      */
-    protected function arr2json ($data)
+    protected function arr2json($data)
     {
         return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
             return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
@@ -39,7 +97,7 @@ class Http
      * @return array
      * @throws Exception
      */
-    protected function json2arr ($json)
+    protected function json2arr($json)
     {
         $result = json_decode($json, true);
 
@@ -57,75 +115,145 @@ class Http
     }
 
     /**
-     * 以get访问模拟访问
+     * 设置请求头信息
      *
-     * @param string $url   访问URL
-     * @param array  $query GET数
-     * @param array  $options
-     *
-     * @return array
-     * @throws Exception
+     * @param array $header
+     * @return zhlix\helper\Http
      */
-    public function get ($url, $query = [], $options = [])
+    public function header(string $header)
     {
-        $options['query'] = $query;
-        return $this->json2arr($this->doRequest('get', $url, $options));
+        curl_setopt($this->_curl, CURLOPT_HTTPHEADER, array_merge($this->_header, $header));
+        return $this;
     }
 
     /**
-     * 以post访问模拟访问
+     * 设置请求地址
      *
-     * @param string $url  访问URL
-     * @param array  $data POST数据
-     * @param array  $options
-     *
-     * @return array
-     * @throws Exception
+     * @param string $url
+     * @return zhlix\helper\Http
      */
-    public function post ($url, $data = [], $options = [])
+    public function url(string $url)
     {
-        $options['data'] = $data;
-        return $this->json2arr($this->doRequest('post', $url, $options));
+        $this->_url = $url;
+        return $this;
     }
 
     /**
-     * CURL模拟网络请求
+     * 设置请求类型
      *
-     * @param       $method
-     * @param       $url
-     * @param array $options
-     *
-     * @return mixed
+     * @param string $method
+     * @return zhlix\helper\Http
      */
-    protected function doRequest ($method, $url, $options = [])
+    public function method(string $method)
     {
-        $curl = curl_init();
-        // GET参数设置
-        if (!empty($options['query'])) {
-            $url .= (stripos($url, '?') !== false ? '&' : '?') . http_build_query($options['query']);
+        $this->_method = strtolower($method);
+        return $this;
+    }
+
+
+    /**
+     * 设置请求参数
+     *
+     * @param string $params
+     * @return zhlix\helper\Http
+     */
+    public function params(array $params)
+    {
+        $this->_params = array_merge($this->_params, $params);
+        return $this;
+    }
+
+
+    /**
+     * 设置 auth 认证
+     *
+     * @param string $params
+     * @return zhlix\helper\Http
+     */
+    public function auth(string $username, string $password)
+    {
+        if ($username && $password) {
+            curl_setopt($this->_curl, CURLOPT_USERPWD, "$username:$password");
         }
-        // POST数据设置
-        if (strtolower($method) === 'post') {
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($options['data']));
+        return $this;
+    }
+
+    /**
+     * 设置超时时间
+     *
+     * @param integer $timeout
+     * @param integer $connect_timeout
+     * @return zhlix\helper\Http
+     */
+    public function timeout(int $timeout, int $connect_timeout = null)
+    {
+        $this->_timeout = $timeout;
+        if ($connect_timeout) $this->_connect_timeout = $connect_timeout;
+        return $this;
+    }
+
+
+    /**
+     * 设置请求参数
+     *
+     * @param string $params
+     * @return string
+     */
+    protected function setParams()
+    {
+        switch ($this->_method) {
+            case 'get':
+                return $this->_url . (stripos($this->_url, '?') !== false ? '&' : '?') . http_build_query($this->_params);
+            default:
+                curl_setopt($this->_curl, CURLOPT_POST, true);
+                curl_setopt($this->_curl, CURLOPT_POSTFIELDS, json_encode($this->_params));
         }
-        // CURL头信息设置
-        if (!empty($options['headers'])) {
-            //            p($options['headers']);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $options['headers']);
+    }
+
+    protected function setTimeout()
+    {
+        curl_setopt($this->_curl, CURLOPT_TIMEOUT, $this->_timeout);
+        if ($this->_connect_timeout ?? false) {
+            curl_setopt($this->_curl, CURLOPT_CONNECTTIMEOUT, $this->_connect_timeout);
         }
-        // auth 认证
-        if (!empty($options['auth'])) {
-            curl_setopt($curl, CURLOPT_USERPWD, $options['auth']['username'] . ":" . $options['auth']['password']);
+    }
+
+    public function get(string $url, array $data = [], array $header = [], string $auth = '')
+    {
+        return $this->request($url, 'get', $data, $header, $auth);
+    }
+
+    public function post(string $url, array $data = [], array $header = [], string $auth = '')
+    {
+        return $this->request($url, 'post', $data, $header, $auth);
+    }
+
+    public function request(string $url, string $method, array $data = [], array $header = [], string $auth = '')
+    {
+        return $this->url($url)
+            ->method($method)
+            ->params($data)
+            ->header($header)
+            ->auth(...explode(':', $auth))->do();
+    }
+
+    public function do()
+    {
+        validate_check([
+            'url' => $this->_url
+        ], [
+            'url' => 'require'
+        ], [
+            'url' => 'url 参数不存在'
+        ]);
+
+        if (!($url = $this->setParams())) {
+            $url = $this->_url;
         }
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 60);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        list($content) = [curl_exec($curl), curl_close($curl)];
+        $this->setTimeout();
+        curl_setopt($this->_curl, CURLOPT_URL, $url);
+
+        list($content) = [curl_exec($this->_curl), curl_close($this->_curl)];
 
         return $content;
     }

@@ -1,0 +1,27 @@
+version: "3"
+services:
+    php:
+        image: "crunchgeek/php-fpm:7.2-r6"
+        working_dir: /app
+        restart: unless-stopped
+        ports:
+            - 7050:8000
+        volumes:
+            - ./:/app:rw
+        command:
+            - /bin/bash
+            - -c
+            - |
+                sed -i 's#http://deb.debian.org#https://mirrors.163.com#g' /etc/apt/sources.list
+                composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+                # php think run
+                tail -f /dev/null
+        networks:
+            extnetwork:
+                ipv4_address: 172.25.0.2
+
+networks:
+    extnetwork:
+        ipam:
+            config:
+                -   subnet: 172.25.0.0/16
