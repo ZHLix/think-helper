@@ -1,8 +1,8 @@
 <?php
 /*
  * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-11-16 07:05:44
- * @FilePath: /app/src/Http.php
+ * @LastEditTime: 2020-11-16 15:52:02
+ * @FilePath: /think-helper/src/Http.php
  */
 
 namespace zhlix\helper;
@@ -14,7 +14,7 @@ class Http
     /**
      * 初始化
      */
-    protected function __construct()
+    public function __construct()
     {
         $this->_curl = curl_init();
         curl_setopt($this->_curl, CURLOPT_HEADER, false);
@@ -120,7 +120,7 @@ class Http
      * @param array $header
      * @return zhlix\helper\Http
      */
-    public function header(string $header)
+    public function header(array $header)
     {
         curl_setopt($this->_curl, CURLOPT_HTTPHEADER, array_merge($this->_header, $header));
         return $this;
@@ -170,7 +170,7 @@ class Http
      * @param string $params
      * @return zhlix\helper\Http
      */
-    public function auth(string $username, string $password)
+    public function auth(string $username, string $password = '')
     {
         if ($username && $password) {
             curl_setopt($this->_curl, CURLOPT_USERPWD, "$username:$password");
