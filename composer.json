@@ -22,5 +22,13 @@
         "files": [
             "helper.php"
         ]
+    },
+    "extra": {
+        "think": {
+            "config": {
+                "zhlix_file": "src/config/file.php",
+                "zhlix_aes": "src/config/aes.php"
+            }
+        }
     }
 }

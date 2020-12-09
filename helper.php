@@ -1,8 +1,7 @@
 <?php
 
-use think\facade\Db;
-use \think\response\Json;
 use think\Validate;
+use zhlix\helper\facade\Aes;
 use zhlix\helper\facade\Http;
 use zhlix\helper\facade\Rsa;
 
@@ -98,7 +97,7 @@ if (!function_exists('time_micro')) {
     /**
      * @return float 当前时间（加上毫秒）
      */
-    function time_micro ()
+    function time_micro()
     {
         list($msec, $sec) = explode(' ', microtime());
         return (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
@@ -136,7 +135,7 @@ if (!function_exists('rsa_decode')) {
      *
      * @return string
      */
-    function rsa_decode ($string)
+    function rsa_decode($string)
     {
         return Rsa::decode($string);
     }
@@ -150,9 +149,35 @@ if (!function_exists('rsa_encode')) {
      *
      * @return string
      */
-    function rsa_encode ($string)
+    function rsa_encode($string)
     {
         return Rsa::encode($string);
+    }
+}
+
+if (!function_exists('aes_encode')) {
+    /**
+     * aes 加密
+     *
+     * @param mixed $data
+     * @return string
+     */
+    function aes_encode($data): string
+    {
+        return Aes::encode($data);
+    }
+}
+
+if (!function_exists('aes_decode')) {
+    /**
+     * aes 解密
+     *
+     * @param string $data
+     * @return mixed
+     */
+    function aes_decode($data)
+    {
+        return Aes::decode($data);
     }
 }
 
@@ -167,7 +192,7 @@ if (!function_exists('http_get')) {
      * @return array
      * @throws Exception
      */
-    function http_get ($url, $params = [], $header = [], $auth = '')
+    function http_get($url, $params = [], $header = [], $auth = '')
     {
         return Http::get($url, $params, $header, $auth);
     }
@@ -184,7 +209,7 @@ if (!function_exists('http_post')) {
      * @return array
      * @throws Exception
      */
-    function http_post ($url, $params = [], $header = [], $auth = '')
+    function http_post($url, $params = [], $header = [], $auth = '')
     {
         return Http::post($url, $params, $header, $auth);
     }
