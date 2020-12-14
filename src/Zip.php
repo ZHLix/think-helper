@@ -1,8 +1,8 @@
 <?php
 /*
  * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-12-09 09:42:28
- * @FilePath: /app/vendor/zhlix/think-helper/src/Zip.php
+ * @LastEditTime: 2020-12-14 22:30:54
+ * @FilePath: /think-helper/src/Zip.php
  */
 
 namespace zhlix\helper;
@@ -57,7 +57,7 @@ class Zip
 
     public function list($glob = '**/*.*')
     {
-        $files = glob("{$this->tmp_dir}/$glob");
+        $files = glob("{$this->tmp_dir}/$glob", GLOB_BRACE);
         return $files;
     }
 
