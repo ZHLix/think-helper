@@ -1,8 +1,8 @@
 <?php
 /*
  * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-12-09 15:50:56
- * @FilePath: /mock_exam/extend/zhlix/helper/Aes.php
+ * @LastEditTime: 2020-12-14 22:20:01
+ * @FilePath: /think-helper/src/Aes.php
  */
 
 namespace zhlix\helper;
@@ -35,9 +35,9 @@ class Aes
      * @param [type] $data
      * @return string
      */
-    public function encode($data)
+    public function encode($data, $iv = null)
     {
-        $iv = nonce_str(16);
+        if (!$iv) $iv = nonce_str(16);
         $data = json_encode($data);
         $tmp = base64_encode(openssl_encrypt(
             $data,

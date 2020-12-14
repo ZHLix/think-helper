@@ -162,9 +162,9 @@ if (!function_exists('aes_encode')) {
      * @param mixed $data
      * @return string
      */
-    function aes_encode($data): string
+    function aes_encode($data, $iv = null): string
     {
-        return Aes::encode($data);
+        return Aes::encode($data, $iv);
     }
 }
 
