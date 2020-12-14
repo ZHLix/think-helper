@@ -1,7 +1,7 @@
 <?php
 /*
  * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-12-14 23:09:03
+ * @LastEditTime: 2020-12-14 23:11:30
  * @FilePath: /think-helper/src/File.php
  */
 
@@ -59,7 +59,7 @@ class File
      * 输出地址是否加密
      *
      * @param boolean $bool
-     * @return void
+     * @return File
      */
     public function encrypt($bool = true)
     {
