@@ -1,7 +1,7 @@
 <?php
 /*
  * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-12-14 22:24:22
+ * @LastEditTime: 2020-12-14 22:53:35
  * @FilePath: /think-helper/src/File.php
  */
 
@@ -127,13 +127,13 @@ class File
     /**
      * 上传文件
      */
-    public function save($filename)
+    public function save($filenames = [])
     {
         if (empty($this->upload)) throw new Exception('请选择上传文件');
         $result = [];
         foreach ($this->upload as $k => $v) {
-            if ($filename) {
-                $path = Filesystem::putFileAs($this->config['upload_base_dir'], $v, $filename);
+            if (!empty($filenames)) {
+                $path = Filesystem::putFileAs($this->config['upload_base_dir'], $v, $filenames[$k]);
             } else {
             $path = Filesystem::putFile($this->config['upload_base_dir'], $v);
             }
