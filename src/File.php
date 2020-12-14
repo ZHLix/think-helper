@@ -1,7 +1,7 @@
 <?php
 /*
  * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-12-14 22:53:35
+ * @LastEditTime: 2020-12-14 23:09:03
  * @FilePath: /think-helper/src/File.php
  */
 
@@ -133,9 +133,9 @@ class File
         $result = [];
         foreach ($this->upload as $k => $v) {
             if (!empty($filenames)) {
-                $path = Filesystem::putFileAs($this->config['upload_base_dir'], $v, $filenames[$k]);
+                $path = Filesystem::putFileAs($this->config['upload_base_dir'], $v, date('Ymd') . DIRECTORY_SEPARATOR .  $filenames[$k]);
             } else {
-            $path = Filesystem::putFile($this->config['upload_base_dir'], $v);
+                $path = Filesystem::putFile($this->config['upload_base_dir'], $v);
             }
             if ($this->encrypt) $path = $this->encode($path);
             $result[$k] = $path;
@@ -157,7 +157,8 @@ class File
         }
     }
 
-    public function delete($path) {
+    public function delete($path)
+    {
         if (!$path) $path = $this->read;
         if (!file_exists($path)) throw new Exception('目标文件不存在');
         unlink($path);
