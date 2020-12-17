@@ -1,7 +1,7 @@
 <?php
 /*
  * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-12-14 22:20:01
+ * @LastEditTime: 2020-12-17 17:35:59
  * @FilePath: /think-helper/src/Aes.php
  */
 
@@ -58,13 +58,13 @@ class Aes
     public function decode(string $data)
     {
         [$data, $iv] = $this->ivHandle($data);
-        return openssl_decrypt(
+        return json_decode(openssl_decrypt(
             base64_decode($data),
             'AES-128-CBC',
             $this->config['key'],
             $this->options(),
             $iv
-        );
+        ), 1);
     }
 
     protected function ivHandle(string $data, $iv = '')
