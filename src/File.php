@@ -1,7 +1,7 @@
 <?php
 /*
  * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-12-14 23:14:46
+ * @LastEditTime: 2020-12-18 15:51:24
  * @FilePath: /think-helper/src/File.php
  */
 
@@ -116,7 +116,7 @@ class File
      */
     public function upload($files = [])
     {
-        if (!empty($files)) $files = request()->file();
+        if (empty($files)) $files = request()->file();
         $this->read = null;
         $this->type = 'upload';
 
