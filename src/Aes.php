@@ -1,7 +1,7 @@
 <?php
 /*
  * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-12-17 17:35:59
+ * @LastEditTime: 2020-12-18 11:13:18
  * @FilePath: /think-helper/src/Aes.php
  */
 
@@ -38,9 +38,8 @@ class Aes
     public function encode($data, $iv = null)
     {
         if (!$iv) $iv = nonce_str(16);
-        $data = json_encode($data);
         $tmp = base64_encode(openssl_encrypt(
-            $data,
+            json_encode($data),
             'AES-128-CBC',
             $this->config['key'],
             $this->options(),
@@ -58,13 +57,16 @@ class Aes
     public function decode(string $data)
     {
         [$data, $iv] = $this->ivHandle($data);
-        return json_decode(openssl_decrypt(
+        $result = openssl_decrypt(
             base64_decode($data),
             'AES-128-CBC',
             $this->config['key'],
             $this->options(),
             $iv
-        ), 1);
+        );
+        $result_json = json_decode($result, 1);
+        if ($result_json) return $result_json;
+        return $result;
     }
 
     protected function ivHandle(string $data, $iv = '')

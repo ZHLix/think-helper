@@ -97,8 +97,11 @@ class Rsa
      */
     public function decode ($data)
     {
-        openssl_private_decrypt(base64_decode($data), $output, $this->privateKey);
-        return $output;
+        openssl_private_decrypt(base64_decode($data), $result, $this->privateKey);
+
+        $result_json = json_decode($result, 1);
+        if ($result_json) return $result_json;
+        return $result;
     }
 
     /**
@@ -110,7 +113,7 @@ class Rsa
      */
     public function encode ($data)
     {
-        openssl_public_encrypt($data, $output, $this->publicKey);
+        openssl_public_encrypt(json_encode($data), $output, $this->publicKey);
         return base64_encode($output);
     }
 
