@@ -1,7 +1,9 @@
 <?php
 /*
+ * @Author: zhlix
+ * @Date: 2020-12-17 17:36:36
+ * @LastEditTime: 2021-01-11 18:23:08
  * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-12-18 15:51:24
  * @FilePath: /think-helper/src/File.php
  */
 
@@ -90,13 +92,15 @@ class File
     {
         if ($this->type == 'read') {
             switch ($name) {
+                case 'name':
+                    return basename($this->read);
                 case 'path':
                     return $this->read;
                 case 'size':
                     return filesize($this->read);
                 case 'mime':
-                    return mime_content_type($this->read);
-
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    return finfo_file($finfo, $this->read);
                 case 'mtime':
                     return filemtime($this->read);
                 default:
@@ -134,7 +138,7 @@ class File
         $result = [];
         foreach ($this->upload as $k => $v) {
             if (!empty($filenames)) {
-                $path = Filesystem::putFileAs($this->config['upload_base_dir'], $v, date('Ymd') . DIRECTORY_SEPARATOR .  $filenames[$k]);
+                $path = Filesystem::putFileAs($this->config['upload_base_dir'], $v, $filenames[$k]);
             } else {
                 $path = Filesystem::putFile($this->config['upload_base_dir'], $v);
             }
@@ -149,16 +153,22 @@ class File
      *
      * @return void
      */
-    public function output()
+    public function output($filename = null)
     {
         if ($this->type == 'read') {
             if (empty($this->read)) throw new Exception('文件错误');
             $content = file_get_contents($this->read);
-            return response($content, 200, ['content-type' => $this->info('mime')]);
+            if (empty($filename)) $filename = $this->info('name');
+            $header = [
+                'content-type' => $this->info('mime'),
+                "Accept-Length" =>  $this->info('size'),
+                'Content-Disposition' => "attachment; filename=" . $filename
+            ];
+            return response($content, 200, $header);
         }
     }
 
-    public function delete($path)
+    public function delete($path = null)
     {
         if (!$path) $path = $this->read;
         if (!file_exists($path)) throw new Exception('目标文件不存在');
