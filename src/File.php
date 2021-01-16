@@ -2,7 +2,7 @@
 /*
  * @Author: zhlix
  * @Date: 2020-12-17 17:36:36
- * @LastEditTime: 2021-01-11 18:23:08
+ * @LastEditTime: 2021-01-16 19:23:23
  * @LastEditors: zhlix <15127441165@163.com>
  * @FilePath: /think-helper/src/File.php
  */
@@ -116,7 +116,7 @@ class File
     /**
      * 读取上传列表
      *
-     * @return void
+     * @return File
      */
     public function upload($files = [])
     {
