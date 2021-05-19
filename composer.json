@@ -1,34 +1,34 @@
 {
-    "name": "zhlix/think-helper",
-    "license": "Apache-2.0",
-    "authors": [
-        {
-            "name": "zhlix",
-            "email": "15127441165@sina.cn"
-        }
-    ],
-    "require": {
-        "ext-mbstring": "*",
-        "ext-curl": "*",
-        "ext-json": "*",
-        "ext-openssl": "*",
-        "php": ">=7.1.0",
-        "topthink/framework": "^6.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "zhlix\\helper\\": "src"
-        },
-        "files": [
-            "helper.php"
-        ]
-    },
-    "extra": {
-        "think": {
-            "config": {
-                "zhlix_file": "src/config/file.php",
-                "zhlix_aes": "src/config/aes.php"
-            }
-        }
+  "name": "zhlix/think-helper",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "zhlix",
+      "email": "15127441165@sina.cn"
     }
+  ],
+  "require": {
+    "php": ">=7.1.0",
+    "topthink/framework": "^6.0",
+    "phpseclib/phpseclib": "^2.0",
+    "spatie/temporary-directory": "^1.3",
+    "guzzlehttp/guzzle": "^7.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5",
+    "monolog/monolog": "^2.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "zhlix\\helper\\": "src"
+    },
+    "files": [
+      "helper.php"
+    ]
+  },
+  "extra": {
+    "think": {
+      "config": {}
+    }
+  }
 }

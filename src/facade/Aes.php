@@ -1,28 +1,27 @@
 <?php
 /*
- * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-12-09 06:41:41
- * @FilePath: /app/src/facade/Aes.php
+ * @Author: zhlix
+ * @Date: 2021-05-18 14:15:50
+ * @LastEditTime: 2021-05-19 11:54:03
+ * @LastEditors: zhlix <2689921152@qq.com>
+ * @FilePath: /think-helper/src/facade/Aes.php
  */
-
 
 namespace zhlix\helper\facade;
 
-
 use think\Facade;
-use zhlix\helper\Aes as HelperAes;
+use zhlix\helper\Crypt\Aes as CryptAes;
 
 /**
- * @see \zhlix\helper\Aes
- * @package think\facade
- * @mixin \zhlix\helper\Aes
- * @method static mixed encode($data) Aes 加密
- * @method static mixed decode(string $data) Aes 解密
+ * @see CryptAes
+ * @package think/Facade
+ * @method static string encrypt(mixed $data) aes 加密
+ * @method static mixed decrypt(string $data) aes 解密
  */
 class Aes extends Facade
 {
-    protected static function getFacadeClass ()
+    protected static function getFacadeClass()
     {
-        return HelperAes::class;
+        return CryptAes::class;
     }
 }

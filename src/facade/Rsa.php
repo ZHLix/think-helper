@@ -1,30 +1,27 @@
 <?php
 /*
- * @LastEditors: zhlix <15127441165@163.com>
- * @LastEditTime: 2020-11-16 07:19:14
- * @FilePath: /app/src/facade/Rsa.php
+ * @Author: zhlix
+ * @Date: 2021-05-18 14:15:50
+ * @LastEditTime: 2021-05-19 12:29:57
+ * @LastEditors: zhlix <2689921152@qq.com>
+ * @FilePath: /think-helper/src/facade/Rsa.php
  */
-
 
 namespace zhlix\helper\facade;
 
-
 use think\Facade;
-use zhlix\helper\Rsa as HelperRsa;
+use zhlix\helper\Crypt\Rsa as CryptRsa;
 
 /**
- * @see \zhlix\helper\Rsa
- * @package think\facade
- * @mixin \zhlix\helper\Rsa
- * @method static string encode(string $data) rsa 加密
- * @method static string decode(string $data) rsa 解密
- * @method static string getPublicKey(string $data) 获取公钥
- * @method static string getPrivateKey(string $data) 获取私钥
+ * @see CryptRsa
+ * @package think/Facade
+ * @method static string encrypt(mixed $data, $type = 'public') rsa 加密
+ * @method static mixed decrypt(string $data, $type = 'private') rsa 解密
  */
 class Rsa extends Facade
 {
-    protected static function getFacadeClass ()
+    protected static function getFacadeClass()
     {
-        return HelperRsa::class;
+        return CryptRsa::class;
     }
 }

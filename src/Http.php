@@ -1,262 +1,170 @@
 <?php
 /*
  * @Author: zhlix
- * @Date: 2020-12-17 17:36:36
- * @LastEditTime: 2021-01-11 18:23:17
- * @LastEditors: zhlix <15127441165@163.com>
+ * @Date: 2021-05-19 11:11:47
+ * @LastEditTime: 2021-05-19 12:24:51
+ * @LastEditors: zhlix <2689921152@qq.com>
  * @FilePath: /think-helper/src/Http.php
  */
 
 namespace zhlix\helper;
 
 use Exception;
+use GuzzleHttp\Client;
+use JsonException;
 
 class Http
 {
     /**
-     * 初始化
+     * @return Client
      */
-    public function __construct()
-    {
-        $this->_curl = curl_init();
-        curl_setopt($this->_curl, CURLOPT_HEADER, false);
-        curl_setopt($this->_curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($this->_curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->_curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($this->_curl, CURLOPT_SSL_VERIFYHOST, false);
-    }
+    protected $client;
 
     /**
-     * curl 对象
-     *
-     * @var curl
-     */
-    protected $_curl = null;
-
-    /**
-     * 请求地址
-     *
-     * @var string
-     */
-    protected $_url = null;
-
-    /**
-     * 请求方式
-     *
-     * @var string
-     */
-    protected $_method = 'get';
-
-    /**
-     * 请求头信息
-     *
-     * @var array
-     */
-    protected $_header = [
-        'content-type: application/json'
-    ];
-
-    /**
-     * 请求参数
-     *
-     * @var array
-     */
-    protected $_params = [];
-
-    /**
-     * 超时时间
-     *
-     * @var integer
-     */
-    protected $_timeout = 60;
-
-    /**
-     * 连接超时时间
-     *
-     * @var integer
-     */
-    protected $_connect_timeout = null;
-
-    /**
-     * 数组转xml内容
-     *
-     * @param array $data
-     *
-     * @return null|string|string
-     */
-    protected function arr2json($data)
-    {
-        return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
-            return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
-        }, ($jsonData = json_encode($data)) == '[]' ? '{}' : $jsonData);
-    }
-
-    /**
-     * 解析JSON内容到数组
-     *
-     * @param string $json
-     *
-     * @return array
-     * @throws Exception
-     */
-    protected function json2arr($json)
-    {
-        $result = json_decode($json, true);
-
-        if (is_array($result)) {
-            if (empty($result)) {
-                throw new Exception('invalid response.', '0');
-            }
-            if (!empty($result['errcode'])) {
-                throw new Exception($result['errmsg'], $result['errcode']);
-            }
-        } else if (is_null($result) && !is_null($json)) {
-            $result = $json;
-        }
-        return $result;
-    }
-
-    /**
-     * 设置请求头信息
-     *
-     * @param array $header
-     * @return zhlix\helper\Http
-     */
-    public function header(array $header)
-    {
-        curl_setopt($this->_curl, CURLOPT_HTTPHEADER, array_merge($this->_header, $header));
-        return $this;
-    }
-
-    /**
-     * 设置请求地址
-     *
-     * @param string $url
-     * @return zhlix\helper\Http
-     */
-    public function url(string $url)
-    {
-        $this->_url = $url;
-        return $this;
-    }
-
-    /**
-     * 设置请求类型
-     *
-     * @param string $method
-     * @return zhlix\helper\Http
-     */
-    public function method(string $method)
-    {
-        $this->_method = strtolower($method);
-        return $this;
-    }
-
-
-    /**
-     * 设置请求参数
-     *
-     * @param string $params
-     * @return zhlix\helper\Http
-     */
-    public function params(array $params)
-    {
-        $this->_params = array_merge($this->_params, $params);
-        return $this;
-    }
-
-
-    /**
-     * 设置 auth 认证
-     *
-     * @param string $params
-     * @return zhlix\helper\Http
-     */
-    public function auth(string $username, string $password = '')
-    {
-        if ($username && $password) {
-            curl_setopt($this->_curl, CURLOPT_USERPWD, "$username:$password");
-        }
-        return $this;
-    }
-
-    /**
-     * 设置超时时间
-     *
-     * @param integer $timeout
-     * @param integer $connect_timeout
-     * @return zhlix\helper\Http
-     */
-    public function timeout(int $timeout, int $connect_timeout = null)
-    {
-        $this->_timeout = $timeout;
-        if ($connect_timeout) $this->_connect_timeout = $connect_timeout;
-        return $this;
-    }
-
-
-    /**
-     * 设置请求参数
-     *
-     * @param string $params
      * @return string
      */
-    protected function setParams()
+    protected $url;
+
+    /**
+     * @return string
+     */
+    protected $method;
+
+    /**
+     * @return mixed
+     */
+    protected $data;
+
+    /**
+     * @return mixed
+     */
+    protected $auth;
+
+    /**
+     * @return array
+     */
+    protected $headers;
+
+    /**
+     * @return array
+     */
+    protected $options = [];
+
+    public function __construct(array $config = [])
     {
-        switch ($this->_method) {
-            case 'get':
-                return $this->_url . (stripos($this->_url, '?') !== false ? '&' : '?') . http_build_query($this->_params);
-            default:
-                curl_setopt($this->_curl, CURLOPT_POST, true);
-                curl_setopt($this->_curl, CURLOPT_POSTFIELDS, json_encode($this->_params));
+        $this->options = $config;
+        $this->client = new Client($this->options);
+    }
+
+    public function url(string $url): Http
+    {
+        $this->url = $url;
+        return $this;
+    }
+
+    public function method(string $method): Http
+    {
+        $this->method = strtoupper($method);
+        return $this;
+    }
+
+    public function data($data): Http
+    {
+        if (!is_null($data)) $this->data = $data;
+        return $this;
+    }
+
+    public function auth($auth): Http
+    {
+        if (!is_null($auth)) $this->auth = $auth;
+        return $this;
+    }
+
+    public function headers($headers, $reset = false): Http
+    {
+        if (!is_null($headers)) {
+            if ($reset) {
+                $this->headers = $headers;
+            } else {
+                $this->headers = array_merge($this->headers, $headers);
+            }
+        }
+        return $this;
+    }
+
+
+    public function options($options, $reset = false): Http
+    {
+        if (!is_null($options)) {
+
+            if ($reset) {
+                $this->options = $options;
+            } else {
+                $this->options = array_merge($this->options, $options);
+            }
+        }
+        return $this;
+    }
+
+    public function send()
+    {
+        try {
+            $result = (string) $this->client->request($this->method, $this->url, $this->parseOptions())->getBody();
+            $tmp = json_decode($result);
+            if (is_null($tmp)) throw new JsonException();
+            return $tmp;
+        } catch (JsonException $e) {
+            return $result;
         }
     }
 
-    protected function setTimeout()
+    protected function parseOptions(): array
     {
-        curl_setopt($this->_curl, CURLOPT_TIMEOUT, $this->_timeout);
-        if ($this->_connect_timeout ?? false) {
-            curl_setopt($this->_curl, CURLOPT_CONNECTTIMEOUT, $this->_connect_timeout);
+        $tmp = $this->options;
+        if ($this->auth) $tmp['auth'] = $this->auth;
+        if ($this->headers) $tmp['headers'] = $this->headers;
+        if ($this->data) {
+            ['key' => $key, 'value' => $value] = $this->parseData();
+            $tmp[$key] = $value;
         }
+        return $tmp;
     }
 
-    public function get(string $url, array $data = [], array $header = [], string $auth = '')
+    protected function parseData(): array
     {
-        return $this->request($url, 'get', $data, $header, $auth);
+        $key = $this->method == 'GET' ? 'query' : 'params';
+        return ['key' => $key, 'value' => $this->data];
     }
 
-    public function post(string $url, array $data = [], array $header = [], string $auth = '')
+    protected function defaultSend($url, $data = null, $options = null)
     {
-        return $this->request($url, 'post', $data, $header, $auth);
+        $this->url($url);
+        if ($data) $this->data($data);
+        if ($options) $this->options($options);
+        return $this->send();
     }
 
-    public function request(string $url, string $method, array $data = [], array $header = [], string $auth = '')
+    public function get($url, $data = null, $options = null)
     {
-        return $this->url($url)
-            ->method($method)
-            ->params($data)
-            ->header($header)
-            ->auth(...explode(':', $auth))->do();
+        $this->method('get');
+        return $this->defaultSend($url, $data, $options);
     }
 
-    public function do()
+    public function post($url, $data = null, $options = null)
     {
-        validate_check([
-            'url' => $this->_url
-        ], [
-            'url' => 'require'
-        ], [
-            'url' => 'url 参数不存在'
-        ]);
+        $this->method('post');
+        return $this->defaultSend($url, $data, $options);
+    }
 
-        if (!($url = $this->setParams())) {
-            $url = $this->_url;
-        }
-        $this->setTimeout();
-        curl_setopt($this->_curl, CURLOPT_URL, $url);
+    public function put($url, $data = null, $options = null)
+    {
+        $this->method('put');
+        return $this->defaultSend($url, $data, $options);
+    }
 
-        list($content) = [curl_exec($this->_curl), curl_close($this->_curl)];
-
-        return $content;
+    public function delete($url, $data = null, $options = null)
+    {
+        $this->method('delete');
+        return $this->defaultSend($url, $data, $options);
     }
 }
