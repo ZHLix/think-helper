@@ -132,7 +132,7 @@ class Http
 
     protected function parseData(): array
     {
-        $key = $this->method == 'GET' ? 'query' : 'params';
+        $key = $this->method == 'GET' ? 'query' : 'form_params';
         return ['key' => $key, 'value' => $this->data];
     }
 
